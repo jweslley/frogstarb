@@ -85,7 +85,7 @@ public class FrogstarB {
 				}
 
 				boolean response = Console.confirm(true,
-					"The blog with id '%s' doesn't exists. Select another blog and continue (Y/n)? ", suggestedBlogId);
+						"The blog with id '%s' doesn't exists. Select another blog and continue (Y/n)? ", suggestedBlogId);
 				if (!response) {
 					System.exit(5);
 				}
@@ -110,13 +110,13 @@ public class FrogstarB {
 			}
 
 			require(selectedBlog > 0 && selectedBlog <= blogs.size(), "Selected blog number is out of range: [1,"+blogs.size()+"]");
-			String blogId = blogs.get(selectedBlog - 1).getId().split("blog-")[1];
+			String blogId = blogs.get(selectedBlog-1).getId().split("blog-")[1];
 			System.out.println("The selected blog has id "+blogId);
 			return blogId;
 		}
 	}
 
-	public void publish(File file, String... tags) throws ServiceException, IOException {
+	public void publish(File file, String... tags) throws ServiceException,	IOException {
 		String postTitle = getPostTitle(file);
 		Entry post = getPostByTitle(postTitle);
 
@@ -165,7 +165,7 @@ public class FrogstarB {
 		}
 	}
 
-	private Entry getPostByTitle(String title) throws IOException, ServiceException {
+	private Entry getPostByTitle(String title) throws ServiceException, IOException {
 		URL feedUrl = new URL(feedUri+POSTS_FEED_URI_SUFFIX);
 		Feed resultFeed = blogger.getFeed(feedUrl, Feed.class);
 
@@ -194,14 +194,14 @@ public class FrogstarB {
 		String markupExtension = filename.substring(dot+1);
 		MarkupLanguage markupLanguage = MarkupLanguage.byFileExtension.get(markupExtension);
 		if (markupLanguage == null) {
-			System.out.println("WARN: This file extension '"+markupExtension+
-			"' has not a markup parser. I will upload the file content as plain text.");
+			System.out.println("WARN: This file extension '"+markupExtension
+			+"' has not a markup parser. I will upload the file content as plain text.");
 		}
 		return markupLanguage == null ? MarkupLanguage.PlainText : markupLanguage;
 	}
 
 	private static File toFile(String filename) {
-		File file = new File(filename);
+		File file = new File(filename.trim());
 		require(file.exists(), "File not found: "+file);
 		require(file.isFile(), "File is a directory: "+file);
 		require(file.canRead(), "No permission to read the file: "+file);
@@ -213,7 +213,7 @@ public class FrogstarB {
 			throw new IllegalArgumentException(message);
 		}
 	}
-	
+
 	private static void printAndExit(String msg, Exception cause, int exitCode) {
 		System.err.println(msg);
 		if (cause != null) {
@@ -233,34 +233,33 @@ public class FrogstarB {
 		return properties;
 	}
 
-	public static void addOption(Options options, String opt, String longOpt, String argName, String description) {
+	public static void addOption(Options options, String opt, String longOpt,
+			String argName, String description) {
 		Option option = new Option(opt, longOpt, true, description);
 		option.setArgName(argName);
 		options.addOption(option);
-    }
+	}
 
 	public static void main(String[] args) throws Exception {
 		Options options = new Options();
-		addOption(options, "e", "email", "EMAIL",
-			"The email of the blogger user. This option is not required if " +
-			"the 'email' property is defined in the configuration file '~/.frogstarb'.");
+		addOption(options, "e",	"email", "EMAIL",
+			"The email of the blogger user. This option is not required if "
+			+ "the 'email' property is defined in the configuration file '~/.frogstarb'.");
 		addOption(options, "P", "password", "PASSWORD",
-			"The password of the blogger user. This option is not required if " +
-			"the 'password' property is defined in the configuration file '~/.frogstarb'.");
+			"The password of the blogger user. This option is not required if "
+			+ "the 'password' property is defined in the configuration file '~/.frogstarb'.");
 		addOption(options, "b", "blog-id", "BLOGID",
-			"The blog's id. This option is not required if either the blogger user has just one blog " +
-			"or the 'blog-id' property is defined in the configuration file '~/.frogstarb'.");
+			"The blog's id. This option is not required if either the blogger user has just one blog "
+			+ "or the 'blog-id' property is defined in the configuration file '~/.frogstarb'.");
 		addOption(options, "t", "tags", "TAG_LIST",
-			"The list of tags to be added or removed from the post, specified as a comma-separated list. " +
-			"If the tag name starts with '-' then it will be removed, otherwise it will be added to the post's list of tags.");
+			"The list of tags to be added or removed from the post, specified as a comma-separated list. "
+			+ "If the tag name starts with '-' then it will be removed, otherwise it will be added to the post's list of tags.");
 		addOption(options, "p", "publish", "FILENAME",
-			"Publish the post. If the post doesn't exist yet, it will be created; otherwise the post will be updated.");
-		addOption(options, "d", "delete", "FILENAME",
-			"Delete the post.");
-		options.addOption("v", "version", false,
-			"Display current version and exit.");
-		options.addOption("h", "help", false,
-			"Display this help and exit.");
+			"Publish the post. The post title is equal to the FILENAME without extension. "
+			+"If the post doesn't exist yet, it will be created; otherwise the post will be updated.");
+		addOption(options, "d", "delete", "FILENAME", "Delete the post whose title is equal to the FILENAME without extension.");
+		options.addOption("v", "version", false, "Display current version and exit.");
+		options.addOption("h", "help", false, "Display this help and exit.");
 
 		try {
 			CommandLineParser parser = new PosixParser();
@@ -271,9 +270,9 @@ public class FrogstarB {
 				System.exit(0);
 			}
 
-			if (line.hasOption("help")) {
+			if (line.hasOption("help") || args.length == 0) {
 				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp(80,"frogstarb [OPTIONS] ... [-p <FILENAME>] [-d <FILENAME>]",
+				formatter.printHelp(80, "frogstarb [OPTIONS] ... [-p <FILENAME>] [-d <FILENAME>]",
 				"\nfrogstarb creates, updates and deletes posts on blogger.com\nOptions:\n\n", options, "");
 				System.exit(0);
 			}
@@ -284,15 +283,12 @@ public class FrogstarB {
 			String blogId = line.hasOption("blog-id") ? line.getOptionValue("blog-id") : properties.getProperty("blog-id");
 
 			if (password == null || password.trim().isEmpty()) {
-	            password = Console.readString("Enter your password(%s): ", email);
+				password = Console.readString("Enter your password(%s): ", email);
 			}
 
 			if (line.hasOption("publish")) {
 				String[] tags = line.hasOption("tags") ? line.getOptionValue("tags").trim().split(",") : new String[0];
 				File postFile = toFile(line.getOptionValue("publish"));
-
-				System.out.println("file: "+postFile);
-				System.out.println("file: "+postFile.getAbsolutePath());
 				(new FrogstarB(email, password, blogId)).publish(postFile, tags);
 
 			} else if (line.hasOption("delete")) {

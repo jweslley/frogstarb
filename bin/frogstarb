@@ -1,8 +1,20 @@
 #!/bin/sh
 
+# resolve links - $0 may be a softlink
+this="$0"
+while [ -h "$this" ]; do
+  ls=`ls -ld "$this"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '.*/.*' > /dev/null; then
+    this="$link"
+  else
+    this=`dirname "$this"`/"$link"
+  fi
+done
+
 # convert relative path to absolute path
-bin=`dirname "$0"`
-bin=`cd "$bin"&& pwd`
+bin=`dirname "$this"`
+bin=`cd "$bin" && pwd`
 
 # the root of the FrogstarB installation
 FROGSTARB_HOME=`cd $bin/.. && pwd`
@@ -13,4 +25,4 @@ for jar in `ls $FROGSTARB_HOME/lib/*.jar` ; do
   CLASSPATH=$CLASSPATH:$jar
 done
 
-java -cp $CLASSPATH frogstarb.FrogstarB $*
+java -cp $CLASSPATH frogstarb.FrogstarB "$@"
