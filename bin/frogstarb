@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# convert relative path to absolute path
+bin=`dirname "$0"`
+bin=`cd "$bin"&& pwd`
+
+# the root of the FrogstarB installation
+FROGSTARB_HOME=`cd $bin/.. && pwd`
+
+# configure java CLASSPATH
+CLASSPATH=""
+for jar in `ls $FROGSTARB_HOME/lib/*.jar` ; do
+  CLASSPATH=$CLASSPATH:$jar
+done
+
+java -cp $CLASSPATH frogstarb.FrogstarB $*
