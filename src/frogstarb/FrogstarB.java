@@ -116,7 +116,7 @@ public class FrogstarB {
 		}
 	}
 
-	public void publish(File file, String... tags) throws ServiceException,	IOException {
+	public void publish(File file, String... tags) throws Exception {
 		String postTitle = getPostTitle(file);
 		Entry post = getPostByTitle(postTitle);
 
@@ -150,7 +150,7 @@ public class FrogstarB {
 		}
 	}
 
-	private void configurePost(Entry post, File file, String... tags) throws IOException {
+	private void configurePost(Entry post, File file, String... tags) throws Exception {
 		String postTitle = getPostTitle(file);
 		MarkupLanguage markupLanguage = getMarkupLanguage(file);
 		String content = markupLanguage.translate(file);
@@ -227,6 +227,8 @@ public class FrogstarB {
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream(new File(System.getProperty("user.home"), FROGSTARB_PREFERENCES_FILE)));
+			System.getProperties().putAll(properties);
+
 		} catch (IOException e) {
 			// ignore
 		}
@@ -258,6 +260,7 @@ public class FrogstarB {
 			"Publish the post. The post title is equal to the FILENAME without extension. "
 			+"If the post doesn't exist yet, it will be created; otherwise the post will be updated.");
 		addOption(options, "d", "delete", "FILENAME", "Delete the post whose title is equal to the FILENAME without extension.");
+		options.addOption("y", "pygments", false, "Use pygments to highlight code.");
 		options.addOption("v", "version", false, "Display current version and exit.");
 		options.addOption("h", "help", false, "Display this help and exit.");
 
@@ -284,6 +287,10 @@ public class FrogstarB {
 
 			if (password == null || password.trim().isEmpty()) {
 				password = Console.readString("Enter your password(%s): ", email);
+			}
+
+			if (line.hasOption("pygments")) {
+				System.setProperty("pygments", "true");
 			}
 
 			if (line.hasOption("publish")) {

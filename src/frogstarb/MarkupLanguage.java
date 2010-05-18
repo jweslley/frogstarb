@@ -16,8 +16,6 @@
 package frogstarb;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,18 +36,9 @@ public abstract class MarkupLanguage {
 
 	public abstract String translate(String source);
 
-	public final String translate(File file) throws IOException {
-		StringWriter writer = new StringWriter();
-		FileReader reader = new FileReader(file);
-		try {
-			int c;
-			while ((c = reader.read()) != -1) {
-				writer.write(c);
-			}
-		} finally {
-			reader.close();
-		}
-		return translate(writer.toString());
+	public final String translate(File file) throws Exception {
+		String code = Code.codify(file);
+		return translate(code);
 	}
 
 	/**
@@ -101,9 +90,12 @@ public abstract class MarkupLanguage {
 	};
 
 	public static final Map<String, MarkupLanguage> byFileExtension = new HashMap<String, MarkupLanguage>() {{
-		put("textile", Textile);
-		put("md", Markdown);
 		put("txt", PlainText);
+		put("textile", Textile);
+		put("markdown", Markdown);
+		put("mkdn", Markdown);
+		put("mkd", Markdown);
+		put("md", Markdown);
 	}};
 
 }

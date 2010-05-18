@@ -6,6 +6,9 @@ download-dependencies:
 	wget http://download.java.net/maven/2/net/java/textile-j/2.2/textile-j-2.2.jar
 	wget http://markdownj.googlecode.com/files/markdownj-1.0.2b4-0.3.0.jar
 	wget http://linorg.usp.br/apache/commons/cli/binaries/commons-cli-1.2-bin.zip
+	wget http://repo1.maven.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.jar
+	wget http://repo1.maven.org/maven2/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar
+	wget http://repo1.maven.org/maven2/org/apache/velocity/velocity/1.6.4/velocity-1.6.4.jar
 	unzip gdata-src.java-1.41.2.zip > /dev/null
 	unzip commons-cli-1.2-bin.zip > /dev/null
 	cp gdata/java/deps/google-collect-1.0-rc1.jar lib/
