@@ -25,4 +25,4 @@ for jar in `ls $FROGSTARB_HOME/lib/*.jar` ; do
   CLASSPATH=$CLASSPATH:$jar
 done
 
-java -cp $CLASSPATH frogstarb.FrogstarB "$@"
+java -cp $CLASSPATH net.jonhnnyweslley.frogstarb.FrogstarB "$@"

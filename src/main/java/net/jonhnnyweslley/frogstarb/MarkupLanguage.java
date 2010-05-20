@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package frogstarb;
+package net.jonhnnyweslley.frogstarb;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -44,7 +44,7 @@ public abstract class MarkupLanguage {
 	/**
 	 * <code>
 	 * h1. Congratulations!
-	 *
+	 * <br/><br/>
 	 * You read a *textile* document.
 	 * </code>
 	 */
@@ -63,7 +63,7 @@ public abstract class MarkupLanguage {
 	/**
 	 * <code>
 	 * # Congratulations!
-	 *
+	 * <br/><br/>
 	 * You read a *markdown* document.
 	 * </code>
 	 */
@@ -78,7 +78,11 @@ public abstract class MarkupLanguage {
 	};
 
 	/**
-	 *
+	 * <code>
+	 * &lt;h1&gt;Congratulations!&lt;/h1&gt;
+	 * <br/><br/>
+	 * &lt;p&gt;You read a &lt;b&gt;html&lt;/b&gt; document.&lt;/p&gt;
+	 * <code>
 	 */
 	public static final MarkupLanguage PlainText = new MarkupLanguage("text") {
 

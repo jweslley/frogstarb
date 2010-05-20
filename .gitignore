@@ -1,6 +1,9 @@
 .classpath
 .project
 .settings/
-classes/
 lib/
+lib_managed/
+target/
+project/boot/
+project/build/target/
 
