@@ -235,7 +235,7 @@ public class FrogstarB {
 		return properties;
 	}
 
-	public static void addOption(Options options, String opt, String longOpt,
+	private static void addOption(Options options, String opt, String longOpt,
 			String argName, String description) {
 		Option option = new Option(opt, longOpt, true, description);
 		option.setArgName(argName);
