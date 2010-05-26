@@ -34,7 +34,7 @@ public abstract class MarkupLanguage {
 		this.name = name;
 	}
 
-	public abstract String translate(String source);
+	protected abstract String translate(String source);
 
 	public final String translate(File file) throws Exception {
 		String code = Code.codify(file);

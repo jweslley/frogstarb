@@ -38,9 +38,9 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 public class Code extends Directive {
 
-	private static final boolean PYGMENTS = Boolean.getBoolean("pygments");
-	private static final String PYGMENTIZE_BIN = System.getProperty("pygmentize", "pygmentize");
-	private static final String FILE_ENCONDING = System.getProperty("file.encoding", "UTF-8");
+	public static final boolean PYGMENTS = Boolean.getBoolean("pygments");
+	public static final String PYGMENTIZE_BIN = System.getProperty("pygments.path", "pygmentize");
+	public static final String FILE_ENCONDING = System.getProperty("file.encoding", "UTF-8");
 
 	@Override
 	public String getName() {

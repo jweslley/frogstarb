@@ -177,13 +177,13 @@ public class FrogstarB {
 		return null;
 	}
 
-	private String getPostTitle(File file) {
+	public static String getPostTitle(File file) {
 		String filename = file.getName();
 		int dot = filename.lastIndexOf('.');
 		return (dot == -1) ? filename : filename.substring(0, dot);
 	}
 
-	private MarkupLanguage getMarkupLanguage(File file) {
+	public static MarkupLanguage getMarkupLanguage(File file) {
 		String filename = file.getName();
 		int dot = filename.lastIndexOf('.');
 		if (dot == -1) {
@@ -223,7 +223,7 @@ public class FrogstarB {
 		System.exit(exitCode);
 	}
 
-	private static Properties getUserPreferences() {
+	public static Properties getUserPreferences() {
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream(new File(System.getProperty("user.home"), FROGSTARB_PREFERENCES_FILE)));

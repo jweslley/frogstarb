@@ -22,18 +22,18 @@ import java.io.InputStreamReader;
 public class Console {
 
 	private static final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-	
-	public static String readString(String msg, Object... args) throws IOException {
-		System.out.printf(msg, args);
-		return input.readLine();
-	}
 
 	public static boolean confirm(boolean defaultResult, String msg, Object... args) throws IOException {
 		System.out.printf(msg, args);
 		String value = input.readLine();
 		return (value == null || value.isEmpty())
-			? defaultResult
-			: value.equalsIgnoreCase("y") || value.equalsIgnoreCase("yes");
+        ? defaultResult
+        : value.equalsIgnoreCase("y") || value.equalsIgnoreCase("yes");
+	}
+
+	public static String readString(String msg, Object... args) throws IOException {
+		System.out.printf(msg, args);
+		return input.readLine();
 	}
 
 	public static int readInt(int defaultResult, String msg, Object... args) throws IOException {
