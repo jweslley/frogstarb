@@ -33,13 +33,13 @@ def get_blog(config):
   return blogger.new(config)
 
 def publish(path,config):
-  renderer = markup.by_file_extension(path)
+  renderer = markup.by_file_extension(path, config)
   data = renderer(path, config)
   blog = get_blog(config)
   blog.publish(data)
 
 def delete(path,config):
-  renderer = markup.by_file_extension(path)
+  renderer = markup.by_file_extension(path, config)
   data = renderer(path, config)
   blog = get_blog(config)
   post = blog.get_post_by_title(data['title'])
