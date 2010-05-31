@@ -1,8 +1,2 @@
-.classpath
-.project
-.settings/
-lib/
-lib_managed/
-target/
-project/boot/
-project/build/target/
+build/*
+frogstarb/*.pyc

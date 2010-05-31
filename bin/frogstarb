@@ -1,28 +1,32 @@
-#!/bin/sh
+#!/usr/bin/env python
 
-# resolve links - $0 may be a softlink
-this="$0"
-while [ -h "$this" ]; do
-  ls=`ls -ld "$this"`
-  link=`expr "$ls" : '.*-> \(.*\)$'`
-  if expr "$link" : '.*/.*' > /dev/null; then
-    this="$link"
-  else
-    this=`dirname "$this"`/"$link"
-  fi
-done
+"""
+FrogstarB, the Command Line Script
+==================================
 
-# convert relative path to absolute path
-bin=`dirname "$this"`
-bin=`cd "$bin" && pwd`
+This is the command line script for FrogstarB.
 
-# the root of the FrogstarB installation
-FROGSTARB_HOME=`cd $bin/.. && pwd`
+## Usage
 
-# configure java CLASSPATH
-CLASSPATH=""
-for jar in `ls $FROGSTARB_HOME/lib/*.jar` ; do
-  CLASSPATH=$CLASSPATH:$jar
-done
+  frogstarb -p post.markdown
 
-java -cp $CLASSPATH net.jonhnnyweslley.frogstarb.FrogstarB "$@"
+Run "frogstarb --help" to see more options.
+
+See frogstarb/__init__.py for information on using FrogstarB as a module.
+
+## Author and License
+
+Created by [Jonhnny Weslley](http://jonhnnyweslley.net).
+
+Contact: jw [at] jonhnnyweslley.net
+
+Copyright 2010 Jonhnny Weslley
+
+License: Apache License v2.0 (see docs/LICENSE for details)
+"""
+# TODO improve usage
+
+from frogstarb import commandline
+
+if __name__ == '__main__':
+  commandline.run()
