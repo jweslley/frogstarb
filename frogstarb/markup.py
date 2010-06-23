@@ -14,37 +14,42 @@ available.
 
 import os.path
 
+class NotSupportedMarkup(Exception):
+  pass
+
 def render_markdown(path,config={}):
   try:
     import markdown
   except ImportError:
-    pass
+    raise NotSupportedMarkup("Markdown support is not installed yet. Install python-markdown.")
   else:
-    markdown_opts = config.get('markdown', 'meta;codehilite(force_linenos=True,css_class=highlight;footnotes')
+    markdown_opts = config.get('markdown', 'meta;codehilite(force_linenos=True,css_class=highlight);footnotes')
     with open(path, 'r') as f: content = f.read()
     md = markdown.Markdown(markdown_opts.split(';'))
     html = md.convert(content)
     data = {'content':html}
-    data['tags'] = md.Meta.get('tags',[''])[0]
-    data['title'] = md.Meta.get('title',[''])[0]
-    data['draft'] = md.Meta.get('draft',[''])[0]
+    if md.Meta:
+      data['tags'] = md.Meta.get('tags',[''])[0]
+      data['title'] = md.Meta.get('title',[''])[0]
+      data['draft'] = md.Meta.get('draft',[''])[0]
     return data
 
 def render_textile(path,config={}):
   try:
     import textile
   except ImportError:
-    pass
+    raise NotSupportedMarkup("Textile support is not installed yet. Install python-textile.")
   else:
     with open(path, 'r') as f: content = f.read()
-    return textile.textile(content.encode(config.get('encoding','utf-8')))
+    data = {'content':textile.textile(content.encode(config.get('encoding','utf-8')))}
+    return data
 
 def render_rst(path,config={}):
   try:
     from docutils.core import publish_parts
     from cStringIO import StringIO
   except ImportError:
-    pass
+    raise NotSupportedMarkup("ReStructured Text support is not installed yet. Install python-docutils.")
   else:
     with open(path, 'r') as f: content = f.read()
     warning_stream = StringIO()
@@ -58,12 +63,14 @@ def render_rst(path,config={}):
     rst_warnings = warning_stream.getvalue()
     if rst_warnings:
       logging.warn(rst_warnings)
-    return parts['html_body']
+  
+    data = {'content':parts['html_body']}
+    return data
 
 
 # Mapping: file extension -> (human readable name, renderer)
 MARKUP_MAP = {
-#  '.html':     ('HTML', lambda c: c),
+  '.html':     ('HTML', lambda c: c),
 #  '.txt':      ('Plain Text', lambda c: html.linebreaks(html.escape(c))),
   '.markdown': ('Markdown', render_markdown),
   '.mkdn':     ('Markdown', render_markdown),
