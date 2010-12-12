@@ -29,7 +29,7 @@ version_info = (0,1,0, "Beta")
 import blogger
 import markup, pystaches
 
-def __apply_preprocessor(data):
+def __apply_postprocessor(data):
   view = pystaches.FatView()
   view.template = data['content']
   data['content'] = view.render()
@@ -39,8 +39,9 @@ def get_blog(config):
 
 def publish(path,config):
   renderer = markup.by_file_extension(path, config)
-  data = renderer(path, config)
-  __apply_preprocessor(data)
+  with open(path, 'r') as f: content = f.read()
+  data = renderer(content, config)
+  __apply_postprocessor(data)
   print data['content']
 
 #  blog = get_blog(config)

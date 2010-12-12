@@ -15,14 +15,13 @@ import os.path
 class NotSupportedMarkup(Exception):
   pass
 
-def render_markdown(path,config={}):
+def render_markdown(content,config={}):
   try:
     import markdown
   except ImportError:
     raise NotSupportedMarkup("Markdown support is not installed yet. Install python-markdown.")
   else:
     markdown_opts = config.get('markdown', 'meta;codehilite(force_linenos=True,css_class=highlight);footnotes')
-    with open(path, 'r') as f: content = f.read()
     md = markdown.Markdown(markdown_opts.split(';'))
     html = md.convert(content)
     data = {'content':html}
@@ -32,24 +31,22 @@ def render_markdown(path,config={}):
       data['draft'] = md.Meta.get('draft',[''])[0]
     return data
 
-def render_textile(path,config={}):
+def render_textile(content,config={}):
   try:
     import textile
   except ImportError:
     raise NotSupportedMarkup("Textile support is not installed yet. Install python-textile.")
   else:
-    with open(path, 'r') as f: content = f.read()
     data = {'content':textile.textile(content.encode(config.get('encoding','utf-8')))}
     return data
 
-def render_rst(path,config={}):
+def render_rst(content,config={}):
   try:
     from docutils.core import publish_parts
     from cStringIO import StringIO
   except ImportError:
     raise NotSupportedMarkup("ReStructured Text support is not installed yet. Install python-docutils.")
   else:
-    with open(path, 'r') as f: content = f.read()
     warning_stream = StringIO()
     parts = publish_parts(content, writer_name='html4css1',
                         settings_overrides={
@@ -61,7 +58,7 @@ def render_rst(path,config={}):
     rst_warnings = warning_stream.getvalue()
     if rst_warnings:
       logging.warn(rst_warnings)
-  
+ 
     data = {'content':parts['html_body']}
     return data
 
