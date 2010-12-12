@@ -1,19 +1,24 @@
-FrogstarB
----------
+# FrogstarB
 
 FrogstarB is simple tool to post to [Blogger](http://www.blogger.com) from the command line. It's a very easy way to format your content without writing any HTML. You give it text written in your favorite markup language, be that Markdown, Textile, or just plain HTML, and it transforms your text and post to Blogger.
 
-Installation
-------------
+## Installation
 
+`TODO`
 
+## Usage
 
-Usage
------
-
-  `frogstarb [OPTIONS] ... [-p <FILENAME>] [-d <FILENAME>]`
+  `frogstarb [OPTIONS] ... [-p | -d <FILENAME>]`
 
 ### Options
+
+* `-p,--publish <FILENAME>`
+
+  Publish the post. The post title is equal to the `FILENAME` without extension. If the post doesn't exist yet, it will be created; otherwise the post will be updated.
+
+* `-d,--delete <FILENAME>`
+
+  Delete the post whose title is equal to the `FILENAME` without extension.
 
 * `-e,--email <EMAIL>`
 
@@ -31,14 +36,6 @@ Usage
 
   The list of tags to be added or removed from the post, specified as a comma-separated list. If the tag name starts with `'-'` then it will be removed, otherwise it will be added to the post's list of tags.
 
-* `-p,--publish <FILENAME>`
-
-  Publish the post. The post title is equal to the `FILENAME` without extension. If the post doesn't exist yet, it will be created; otherwise the post will be updated.
-
-* `-d,--delete <FILENAME>`
-
-  Delete the post whose title is equal to the `FILENAME` without extension.
-
 * `-v,--version`
 
   Display current version and exit.
@@ -47,10 +44,9 @@ Usage
 
   Display this help and exit.
 
-License
--------
+## License
 
->  Copyright 2010 Jonhnny Weslley
+>  Copyright 2010 Jonhnny Weslley <http://jonhnnyweslley.net>
 >
 >  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 >

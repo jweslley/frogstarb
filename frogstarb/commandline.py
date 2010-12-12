@@ -9,12 +9,18 @@ def parse_options():
   """
     Define and parse `optparse` options for command-line usage.
   """
-  usage = "%prog [OPTIONS] ... [-p | -d <FILENAME>]"
-  desc = "Simple tool to post to Blogger.com from the command line." \
-         "http://github.com/jweslley/frogstarb"
-  version = "%%prog %s" % frogstarb.version
 
-  parser = optparse.OptionParser(usage=usage, description=desc, version=version)
+  parser = optparse.OptionParser(
+      usage =       "%prog [OPTIONS] ... [-p | -d <FILENAME>]",
+      description = "Simple tool to post to Blogger.com from the command line.\n" \
+                    "http://github.com/jweslley/frogstarb",
+      version =     "%%prog %s" % frogstarb.version)
+  parser.add_option("-p", "--publish", dest="publish", metavar="FILENAME",
+    help="Publish the post. The post title is equal to the FILENAME without"  \
+    " extension. If the post doesn't exist yet, it will be created; otherwise"\
+    " the post will be updated.")
+  parser.add_option("-d", "--delete", dest="delete", metavar="FILENAME",
+    help="Delete the post whose title is equal to the FILENAME without extension.")
   parser.add_option("-u", "--username", dest="username", metavar="USERNAME",
     help="The username of the blogger user. This option is not required if " \
     "the 'username' property is defined in the configuration file.")
@@ -27,12 +33,6 @@ def parse_options():
     "in the configuration file.")
   parser.add_option("-t", "--tags", dest="tags", metavar="TAG_LIST",
     help="The list of tags from the post, specified as a comma-separated list.")
-  parser.add_option("-p", "--publish", dest="publish", metavar="FILENAME",
-    help="Publish the post. The post title is equal to the FILENAME without"  \
-    " extension. If the post doesn't exist yet, it will be created; otherwise"\
-    " the post will be updated.")
-  parser.add_option("-d", "--delete", dest="delete", metavar="FILENAME",
-    help="Delete the post whose title is equal to the FILENAME without extension.")
   parser.add_option("-c", "--config-file", dest="config", metavar="CONFIG_FILE",
     help="The configuration file. Defaults to '~/.frogstarb'.", default='')
 

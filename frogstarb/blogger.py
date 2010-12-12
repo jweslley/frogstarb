@@ -24,7 +24,7 @@ class Blog:
     """
     tags = data.get('tags','').strip()
     tags = tags.split(',') if len(tags) > 0 else None
-    print "tags %s" % tags
+    # print "tags %s" % tags TODO use logging
     return self.client.add_post(
       self.blog.get_blog_id(),
       data['title'],
@@ -73,15 +73,6 @@ class Blog:
       List all posts.
     """
     return self.client.get_posts(self.blog.get_blog_id()).entry
-
-  def get_post_by_id(self, post_id):
-    """
-      Retrieve a post by id.
-    """
-    return self.client.get_feed(
-      self.blog.get_post_link().href + '/%s' % post_id,
-      auth_token=self.client.auth_token,
-      desired_class=gdata.blogger.data.BlogPost)
 
   def get_post_by_title(self, post_title):
     """

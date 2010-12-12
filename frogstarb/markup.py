@@ -8,8 +8,6 @@ The following markup languages are supported:
  - Markdown
  - Textile
 
-For ReStructuredText and Markdown syntax highlighting of source code is
-available.
 """
 
 import os.path

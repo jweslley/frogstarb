@@ -23,11 +23,16 @@ License: Apache License v2.0 (see docs/LICENSE for details)
 # TODO improve usage
 
 version = "0.1.0"
-version_info = (0,1,0, "Alpha")
+version_info = (0,1,0, "Beta")
 
 
-import markup
 import blogger
+import markup, pystaches
+
+def __apply_preprocessor(data):
+  view = pystaches.FatView()
+  view.template = data['content']
+  data['content'] = view.render()
 
 def get_blog(config):
   return blogger.new(config)
@@ -35,8 +40,11 @@ def get_blog(config):
 def publish(path,config):
   renderer = markup.by_file_extension(path, config)
   data = renderer(path, config)
-  blog = get_blog(config)
-  blog.publish(data)
+  __apply_preprocessor(data)
+  print data['content']
+
+#  blog = get_blog(config)
+#  blog.publish(data)
 
 def delete(path,config):
   renderer = markup.by_file_extension(path, config)

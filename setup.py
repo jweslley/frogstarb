@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
 import sys, os
-from pkg_resources import require
 from distutils.core import setup
 from distutils.command.install_scripts import install_scripts
 
-version = '0.1.0'
+def publish():
+  """Publish to Pypi"""
+  os.system("python setup.py sdist upload")
+
+if sys.argv[-1] == "publish":
+  publish()
+  sys.exit()
 
 class b_install_scripts(install_scripts):
   """ Customized install_scripts. Create frogstarb.bat for win32. """
@@ -25,31 +30,31 @@ class b_install_scripts(install_scripts):
       except Exception, e:
         print 'ERROR: Unable to create %s: %s' % (bat_path, e)
 
-#require("gdata", "markdown", "pygments")
+version = '0.1.0'
 setup(
    name =          'FrogstarB',
    version =       version,
-   url =           'http://github.com/jweslley/frogstarb',
-   download_url =  'http://github.com/jweslley/frogstarb/tarball/v%s' % version,
    description =   'Simple tool to post to Blogger.com from the command line.',
    author =        'Jonhnny Weslley',
    author_email =  'jw [at] jonhnnyweslley.net',
-   maintainer =    'Jonhnny Weslley',
-   maintainer_email = 'jw [at] jonhnnyweslley.net',
+   url =           'http://github.com/jweslley/frogstarb',
+   download_url =  'http://github.com/jweslley/frogstarb/tarball/v%s' % version,
    license =       'Apache License v2.0',
    packages =      ['frogstarb'],
    scripts =       ['bin/frogstarb'],
-   install_requires = ["gdata", "markdown", "pygments"],
+   requires =      ["gdata", "markdown", "pystaches"],
    cmdclass =      {'install_scripts': b_install_scripts},
-   classifiers =   ['Development Status :: 3 - Alpha',
+   classifiers =   ['Development Status :: 4 - Beta',
+                    'Programming Language :: Python',
+                    'Programming Language :: Python :: 2.5',
+                    'Programming Language :: Python :: 2.6',
+                    'License :: OSI Approved :: Apache Software License',
                     'Environment :: Web Environment',
                     'Intended Audience :: End Users/Desktop',
-                    'License :: OSI Approved :: Apache Software License',
                     'Natural Language :: English',
                     'Operating System :: OS Independent',
-                    'Programming Language :: Python',
                     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                     'Topic :: Internet :: WWW/HTTP :: Site Management',
                     'Topic :: Text Processing :: Markup :: HTML'
                    ]
-) 
+)

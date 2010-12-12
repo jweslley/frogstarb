@@ -10,9 +10,9 @@ This is the command line script for FrogstarB.
 
   frogstarb -p post.markdown
 
-Run "frogstarb --help" to see more options.
+Run `frogstarb --help` to see more options.
 
-See frogstarb/__init__.py for information on using FrogstarB as a module.
+See `frogstarb/__init__.py` for information on using FrogstarB as a module.
 
 ## Author and License
 
@@ -24,7 +24,6 @@ Copyright 2010 Jonhnny Weslley
 
 License: Apache License v2.0 (see docs/LICENSE for details)
 """
-# TODO improve usage
 
 from frogstarb import commandline
 
