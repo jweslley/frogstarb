@@ -63,11 +63,23 @@ def render_rst(content,config={}):
     data = {'content':parts['html_body']}
     return data
 
+def render_plain(content,config={}):
+  html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;",
+    "\n": "<br/>\n" # line breaking
+  }
+  data = {'content':"".join(html_escape_table.get(c,c) for c in content)}
+  return data
+
 
 # Mapping: file extension -> (human readable name, renderer)
 MARKUP_MAP = {
   '.html':     ('HTML', lambda c: c),
-#  '.txt':      ('Plain Text', lambda c: html.linebreaks(html.escape(c))),
+  '.txt':      ('Plain Text', render_plain),
   '.markdown': ('Markdown', render_markdown),
   '.mkdn':     ('Markdown', render_markdown),
   '.mkd':      ('Markdown', render_markdown),
