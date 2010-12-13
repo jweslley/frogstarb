@@ -10,6 +10,7 @@ The following markup languages are supported:
 
 """
 
+import logging
 import os.path
 
 class NotSupportedMarkup(Exception):

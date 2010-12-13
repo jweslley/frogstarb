@@ -24,7 +24,7 @@ class Blog:
     """
     tags = data.get('tags','').strip()
     tags = tags.split(',') if len(tags) > 0 else None
-    # print "tags %s" % tags TODO use logging
+
     return self.client.add_post(
       self.blog.get_blog_id(),
       data['title'],

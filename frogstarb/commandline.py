@@ -1,9 +1,10 @@
 import frogstarb
-import sys
+import sys, logging
 import os.path
-import optparse
-import ConfigParser
+import optparse, ConfigParser
 from getpass import getpass
+
+logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
 
 def parse_options():
   """
@@ -78,7 +79,7 @@ def run():
   """
   options = parse_options()
   config = configure(options)
-  
+
   if not options.publish and not options.delete:
     print "No actions to be taken! :P"
     sys.exit(1)
@@ -97,6 +98,3 @@ def run():
       print "No such file %s" % options.delete
       sys.exit(3)
     frogstarb.delete(options.delete, config)
-
-if __name__ == '__main__':
-  run()

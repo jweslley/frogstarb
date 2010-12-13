@@ -25,11 +25,11 @@ License: Apache License v2.0 (see docs/LICENSE for details)
 version = "0.1.0"
 version_info = (0,1,0, "Beta")
 
-
+import sys, logging
 import blogger
 import markup, pystaches
 
-def __apply_postprocessor(data):
+def _apply_postprocessor(data):
   view = pystaches.FatView()
   view.template = data['content']
   data['content'] = view.render()
@@ -41,8 +41,8 @@ def publish(path,config):
   renderer = markup.by_file_extension(path, config)
   with open(path, 'r') as f: content = f.read()
   data = renderer(content, config)
-  __apply_postprocessor(data)
-  print data['content']
+  _apply_postprocessor(data)
+#  print data['content']
 
 #  blog = get_blog(config)
 #  blog.publish(data)
