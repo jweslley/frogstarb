@@ -25,14 +25,34 @@ License: Apache License v2.0 (see docs/LICENSE for details)
 version = "0.1.0"
 version_info = (0,1,0, "Beta")
 
-import sys, logging
-import blogger
-import markup, pystaches
+import logging
+import blogger, markup
+
+# post processors --------------------------------------------------------------
+
+def pystaches(content):
+  try:
+    import pystaches
+  except ImportError:
+    raise Exception, "Pystaches support is not installed yet. Install pystaches."
+  else:
+    view = pystaches.FatView()
+    view.template = content
+    return view.render()
+
+def smartypants(content):
+  try:
+    import smartypants
+  except ImportError:
+    raise Exception, "Smartypants support is not installed yet. Install smartypants."
+  else:
+    return smartypants.smartyPants(content)
 
 def _apply_postprocessor(data):
-  view = pystaches.FatView()
-  view.template = data['content']
-  data['content'] = view.render()
+  content = data['content']
+  content = pystaches(content)
+  content = smartypants(content)
+  data['content'] = content
 
 def get_blog(config):
   return blogger.new(config)
@@ -42,7 +62,7 @@ def publish(path,config):
   with open(path, 'r') as f: content = f.read()
   data = renderer(content, config)
   _apply_postprocessor(data)
-#  print data['content']
+  print data['content']
 
 #  blog = get_blog(config)
 #  blog.publish(data)

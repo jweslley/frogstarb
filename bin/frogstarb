@@ -12,8 +12,6 @@ This is the command line script for FrogstarB.
 
 Run `frogstarb --help` to see more options.
 
-See `frogstarb/__init__.py` for information on using FrogstarB as a module.
-
 ## Author and License
 
 Created by [Jonhnny Weslley](http://jonhnnyweslley.net).
