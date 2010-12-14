@@ -1,8 +1,7 @@
-import frogstarb
-import sys, logging
-import os.path
+import sys, os.path, logging
 import optparse, ConfigParser
 from getpass import getpass
+import frogstarb
 
 logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
 
@@ -73,28 +72,31 @@ def configure(options,service='blogger'):
 
   return config
 
+def _run():
+  options = parse_options()
+  config = configure(options)
+
+  assert options.publish or options.delete, "No actions to be taken! :P"
+  assert not(options.publish and options.delete), "Choose just one action of publish or delete."
+
+  if options.publish:
+    assert os.path.exists(options.publish), "No such file %s" % options.publish
+    frogstarb.publish(options.publish, config)
+
+  if options.delete:
+    assert os.path.exists(options.delete), "No such file %s" % options.delete
+    frogstarb.delete(options.delete, config)
+
 def run():
   """
     Run FrogstarB from the command line.
   """
-  options = parse_options()
-  config = configure(options)
-
-  if not options.publish and not options.delete:
-    print "No actions to be taken! :P"
+  try:
+    _run()
+  except ImportError as e:
+    module_name = e.args[0].split()[-1]
+    print "%s support is not installed yet. Install %s" % (module_name.capitalize(), module_name)
     sys.exit(1)
-  elif options.publish and options.delete:
-    print "Choose just one action of publish or delete."
+  except AssertionError as e:
+    print e.args[0]
     sys.exit(2)
-
-  if options.publish:
-    if not os.path.exists(options.publish):
-      print "No such file %s" % options.publish
-      sys.exit(3)
-    frogstarb.publish(options.publish, config)
-
-  if options.delete:
-    if not os.path.exists(options.delete):
-      print "No such file %s" % options.delete
-      sys.exit(3)
-    frogstarb.delete(options.delete, config)

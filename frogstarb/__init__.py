@@ -68,7 +68,7 @@ def publish(path,config):
   data = renderer(content, config)
   data['path'] = path
   _apply_postprocessors(data)
-  print data['title']
+  print data['content']
 
 #  blog = get_blog(config)
 #  blog.publish(data)
