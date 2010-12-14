@@ -30,29 +30,34 @@ import blogger, markup
 
 # post processors --------------------------------------------------------------
 
-def pystaches(content):
+def pystaches(data):
   try:
     import pystaches
   except ImportError:
     raise Exception, "Pystaches support is not installed yet. Install pystaches."
   else:
     view = pystaches.FatView()
-    view.template = content
-    return view.render()
+    view.template = data['content']
+    data['content'] = view.render()
 
-def smartypants(content):
+def smartypants(data):
   try:
     import smartypants
   except ImportError:
     raise Exception, "Smartypants support is not installed yet. Install smartypants."
   else:
-    return smartypants.smartyPants(content)
+    data['content'] = smartypants.smartyPants(data['content'])
 
-def _apply_postprocessor(data):
-  content = data['content']
-  content = pystaches(content)
-  content = smartypants(content)
-  data['content'] = content
+def set_title(data):
+  import os.path
+  if not data.has_key('title'):
+    basename = os.path.basename(data['path'])
+    data['title'] = os.path.splitext(basename)[0]
+
+def _apply_postprocessors(data):
+  postprocessors = [pystaches, smartypants, set_title]
+  for postprocessor in postprocessors:
+    postprocessor(data)
 
 def get_blog(config):
   return blogger.new(config)
@@ -61,8 +66,9 @@ def publish(path,config):
   renderer = markup.by_file_extension(path, config)
   with open(path, 'r') as f: content = f.read()
   data = renderer(content, config)
-  _apply_postprocessor(data)
-  print data['content']
+  data['path'] = path
+  _apply_postprocessors(data)
+  print data['title']
 
 #  blog = get_blog(config)
 #  blog.publish(data)
