@@ -24,8 +24,7 @@ def render_markdown(content,config={}):
   else:
     markdown_opts = config.get('markdown', 'meta;codehilite(force_linenos=True,css_class=highlight);footnotes')
     md = markdown.Markdown(markdown_opts.split(';'))
-    html = md.convert(content)
-    data = {'content':html}
+    data = {'content':md.convert(content)}
     if md.Meta:
       data['tags'] = md.Meta.get('tags',[''])[0]
       data['title'] = md.Meta.get('title',[''])[0]
@@ -77,7 +76,7 @@ def render_plain(content,config={}):
 
 
 # Mapping: file extension -> (human readable name, renderer)
-MARKUP_MAP = {
+MARKUP = {
   '.html':     ('HTML', lambda c: c),
   '.txt':      ('Plain Text', render_plain),
   '.markdown': ('Markdown', render_markdown),
@@ -90,4 +89,4 @@ MARKUP_MAP = {
 
 def by_file_extension(path,config={}):
   ext = os.path.splitext(path)[1]
-  return (MARKUP_MAP[ext] if MARKUP_MAP.has_key(ext) else MARKUP_MAP[config.get('markup','.txt')])[1]
+  return (MARKUP[ext] if MARKUP.has_key(ext) else MARKUP[config.get('markup','.txt')])[1]
