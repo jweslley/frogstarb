@@ -89,7 +89,7 @@ def delete(path,config):
   if post:
     print "Your blog post was deleted!"
   else:
-    print "Post not found %s" % data['title']
+    print "Post not found: %s" % data['title']
 
 # TODO def summary(path,config):
 # post title

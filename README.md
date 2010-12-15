@@ -1,50 +1,38 @@
 # FrogstarB
 
-FrogstarB is simple tool to post to [Blogger](http://www.blogger.com) from the command line. It's a very easy way to format your content without writing any HTML. You give it text written in your favorite markup language, be that Markdown, Textile, or just plain HTML, and it transforms your text and post to Blogger.
+FrogstarB is simple tool to post to [Blogger](http://www.blogger.com) from the command line. It's a very easy way to format your content without writing any HTML. You give it text written in your favorite markup language, be that Markdown, Textile, reStructuredText, or just plain HTML, and it transforms your text and post to Blogger.
 
 ## Installation
 
-`TODO`
+### Dependencies
+
+To install the dependencies using `easy_install` just run the following:
+
+    $ sudo easy_install gdata markdown pystaches
+
+### Optional dependencies
+
+* [docutils](http://docutils.sourceforge.net/) - alternate markup language
+* [textile](http://textile.thresholdstate.com/) - alternate markup language
+* [pygments](http://pygments.org/) - syntax highlighter
+* [smartypants](http://daringfireball.net/projects/smartypants/) - translates plain ASCII punctuation characters into HTML entities.
+
+### Installing FrogstarB
+
+Install `frogstarb` by using `easy_install`:
+
+    $ sudo easy_install frogstarb
+
+Or checkout from git repository:
+
+    $ git clone git://github.com/jweslley/frogstarb.git
+    $ cd frogstarb
+    $ sudo python setup.py install
+
+## Configuration
 
 ## Basic Usage
 
-## Usage
-
-  `frogstarb [OPTIONS] ... [-p | -d <FILENAME>]`
-
-### Options
-
-* `-p,--publish <FILENAME>`
-
-  Publish the post. The post title is equal to the `FILENAME` without extension. If the post doesn't exist yet, it will be created; otherwise the post will be updated.
-
-* `-d,--delete <FILENAME>`
-
-  Delete the post whose title is equal to the `FILENAME` without extension.
-
-* `-e,--email <EMAIL>`
-
-  The email of the blogger user. This option is not required if the `'email'` property is defined in the configuration file `'~/.frogstarb'`.
-
-* `-P,--password <PASSWORD>`
-
-  The password of the blogger user. This option is not required if the `'password'` property is defined in the configuration file `'~/.frogstarb'`.
-
-* `-b,--blog-id <BLOGID>`
-
-  The blog's id. This option is not required if either the blogger user has just one blog or the `'blog-id'` property is defined in the configuration file `'~/.frogstarb'`.
-
-* `-t,--tags <TAG_LIST>`
-
-  The list of tags to be added or removed from the post, specified as a comma-separated list. If the tag name starts with `'-'` then it will be removed, otherwise it will be added to the post's list of tags.
-
-* `-v,--version`
-
-  Display current version and exit.
-
-* `-h,--help`
-
-  Display this help and exit.
 
 ## License
 
