@@ -1,7 +1,7 @@
 import sys, os, os.path, logging
 import optparse, ConfigParser
 from getpass import getpass
-import frogstarb
+import frogstarb, blogger
 
 logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
 
@@ -105,3 +105,9 @@ def run():
   except AssertionError as e:
     print e.args[0]
     sys.exit(2)
+  except KeyboardInterrupt:
+    print "Bye!"
+    sys.exit(3)
+  except blogger.NoSuchBlogError as e:
+    print e.args[0]
+    sys.exit(4)

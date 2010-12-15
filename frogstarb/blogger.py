@@ -1,6 +1,7 @@
 import gdata.blogger.client
 import gdata.blogger.data
 import atom
+import sys
 
 class Blog:
   """
@@ -121,17 +122,67 @@ class Account:
 
   def select_blog(self,blog_name):
     """
-      Select a blog by the name interactively, if necessary.
+      Select a blog by the name or interactively, if necessary.
     """
-    # TODO something like http://github.com/jweslley/frogstarb/blob/java/src/main/java/net/jonhnnyweslley/frogstarb/FrogstarB.java#getBlogId()
     blogs = self.client.get_blogs().entry
-    if (len(blogs) == 0):
+    if len(blogs) == 0:
       raise NoSuchBlogError("Ooops! You don't have a blog yet!")
-    elif (len(blogs) == 1):
-      return blogs[0]
-    else:
-      for blog in blogs:
-        if blog.title.text == blog_name:
-          return blog
-      raise NoSuchBlogError("Ooops! You don't have a blog %s" % blog_name)
 
+    if len(blogs) == 1:
+      return blogs[0]
+
+    for blog in blogs:
+      if blog.title.text == blog_name:
+        return blog
+
+    response = self.query_yes_no("The blog '%s' doesn't exists. Select another blog to continue?" % blog_name)
+    if not response:
+      sys.exit(10)
+
+    print "\nList of your blogs:"
+    for i in range(len(blogs)):
+      print "%s : %s" % (i, blogs[i].title.text)
+
+    selected_blog = raw_input("\nSelect one of them typing the blog number (Just press ENTER to exit): ")
+    if not selected_blog:
+      sys.exit(0)
+    try:
+      selected_blog = int(selected_blog)
+    except ValueError:
+      raise NoSuchBlogError("Failed. Invalid blog number: %s" % selected_blog)
+
+    if not (selected_blog >= 0 and selected_blog < len(blogs)):
+      raise NoSuchBlogError("Failed. Selected blog number is out of range: %s" % range(len(blogs)))
+
+    return blogs[selected_blog]
+
+  def query_yes_no(self,question,default="yes"):
+    """
+      Ask a yes/no question via raw_input() and return their answer.
+
+      "question" is a string that is presented to the user.
+      "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+      The "answer" return value is one of "yes" or "no".
+    """
+    valid = {"yes":True, "ye":True, "y":True, "no":False, "n":False}
+    if default == None:
+      prompt = " [y/n] "
+    elif default == "yes":
+      prompt = " [Y/n] "
+    elif default == "no":
+      prompt = " [y/N] "
+    else:
+      raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+      sys.stdout.write(question + prompt)
+      choice = raw_input().lower()
+      if default is not None and choice == '':
+        return valid[default]
+      elif choice in valid:
+        return valid[choice]
+      else:
+        sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
