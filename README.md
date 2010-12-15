@@ -21,13 +21,13 @@ To install the dependencies using `easy_install` just run the following:
 
 Install `frogstarb` by using `easy_install`:
 
-    $ sudo easy_install frogstarb
+    sudo easy_install frogstarb
 
 Or checkout from git repository:
 
-    $ git clone git://github.com/jweslley/frogstarb.git
-    $ cd frogstarb
-    $ sudo python setup.py install
+    git clone git://github.com/jweslley/frogstarb.git
+    cd frogstarb
+    sudo python setup.py install
 
 ## Configuration
 
