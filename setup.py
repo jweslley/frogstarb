@@ -4,14 +4,6 @@ import sys, os
 from distutils.core import setup
 from distutils.command.install_scripts import install_scripts
 
-def publish():
-  """Publish to Pypi"""
-  os.system("python setup.py sdist upload")
-
-if sys.argv[-1] == "publish":
-  publish()
-  sys.exit()
-
 class b_install_scripts(install_scripts):
   """ Customized install_scripts. Create frogstarb.bat for win32. """
   def run(self):

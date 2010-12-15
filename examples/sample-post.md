@@ -1,4 +1,5 @@
 title: A simple sample post
+tags: frogstarb, python, blogger
 
 # Here's a header
 

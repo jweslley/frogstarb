@@ -21,7 +21,7 @@ def render_markdown(content,config):
   if md.Meta:
     data['tags']  = md.Meta.get('tags', [''])[0]
     data['title'] = md.Meta.get('title',[''])[0]
-    data['draft'] = md.Meta.get('draft',[''])[0]
+    data['draft'] = md.Meta.get('draft',['no'])[0]
   return data
 
 def render_textile(content,config):

@@ -1,4 +1,4 @@
-import sys, os.path, logging
+import sys, os, os.path, logging
 import optparse, ConfigParser
 from getpass import getpass
 import frogstarb
@@ -72,6 +72,11 @@ def configure(options,service='blogger'):
 
   return config
 
+def check_file(filename):
+  assert os.path.exists(filename), "No such file %s" % filename
+  assert os.path.isfile(filename), "File is a directory: %s" % filename
+  assert os.access(filename, os.R_OK), "No permission to read the file: %s" % filename
+
 def _run():
   options = parse_options()
   config = configure(options)
@@ -80,11 +85,11 @@ def _run():
   assert not(options.publish and options.delete), "Choose just one action of publish or delete."
 
   if options.publish:
-    assert os.path.exists(options.publish), "No such file %s" % options.publish
+    check_file(options.publish)
     frogstarb.publish(options.publish, config)
 
   if options.delete:
-    assert os.path.exists(options.delete), "No such file %s" % options.delete
+    check_file(options.delete)
     frogstarb.delete(options.delete, config)
 
 def run():

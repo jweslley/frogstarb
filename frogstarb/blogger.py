@@ -22,16 +22,13 @@ class Blog:
       - *tags* -- post's tags, specified as a comma-separated list
       - *draft* -- if this post is a draft
     """
-    tags = data.get('tags','').strip()
-    tags = tags.split(',') if len(tags) > 0 else None
-
     return self.client.add_post(
       self.blog.get_blog_id(),
       data['title'],
       data['content'],
-      labels=tags,
+      labels=self.taglist(data),
       draft=data.get('draft','no').lower() == 'yes'
-      )
+    )
 
   def update_post(self, post, data):
     """
@@ -46,8 +43,17 @@ class Blog:
       and data.get('draft','no') == 'no':
       post.control.draft.text = 'no'
 
-    for tag in data.get('tags','').split(','):
+    # synchronize tags
+    declared_tags = self.taglist(data)
+    current_tags = [category.term for category in post.category]
+    tags_to_add = [tag for tag in declared_tags if tag not in current_tags]
+    tags_to_remove = [tag for tag in current_tags if tag not in declared_tags]
+    for tag in tags_to_add:
       post.add_label(tag)
+    for tag in tags_to_remove:
+      for category in post.category:
+        if category.term == tag:
+          post.category.remove(category)
 
     return self.client.update(post)
 
@@ -57,16 +63,14 @@ class Blog:
       then a new post will be created, otherwise the existent post will be updated.
     """
     post = self.get_post_by_title(data['title'])
-    if post is None:
-      self.add_post(data)
-    else:
-      self.update_post(post, data)
+    return self.update_post(post, data) if post else self.add_post(data)
 
-  def delete(self, post):
+  def delete(self, data):
     """
       Delete a post.
     """
-    return self.client.delete(post)
+    post = self.get_post_by_title(data['title'])
+    return self.client.delete(post) if post else None
 
   def get_posts(self):
     """
@@ -81,42 +85,53 @@ class Blog:
     posts = [post for post in self.get_posts() if post.title.text == post_title]
     return posts[0] if len(posts) == 1 else None
 
+  def taglist(self,data):
+    """
+      Generates a tag list from a comma-separated string value
+    """
+    tags = data.get('tags','').strip()
+    return [tag.strip() for tag in tags.split(',')] if len(tags) > 0 else []
+
 
 class NoSuchBlogError(Exception):
   pass
 
-def connect(config):
-  """
-    ``config`` is a configuration dictionary that must provide values for:
+class Account:
 
-    - *username* -- the email of the blogger user
-    - *password* -- the password of the blogger user
-  """
-  client = gdata.blogger.client.BloggerClient()
-  client.client_login(
-    config['username'],
-    config['password'],
-    'frogstarb',
-    service='blogger')
-  return client
+  def __init__ (self, config):
+    """
+      ``config`` is a configuration dictionary that must provide values for:
 
-def select_blog(client,blog_name=''):
-  """
-    Select a blog by the name.
-  """
-  # TODO something like http://github.com/jweslley/frogstarb/blob/java/src/main/java/net/jonhnnyweslley/frogstarb/FrogstarB.java#getBlogId()
-  blogs = client.get_blogs().entry
-  if (len(blogs) == 0):
-    raise NoSuchBlogError("Ooops! You don't have a blog yet!")
-  elif (len(blogs) == 1):
-    return blogs[0]
-  else:
-    for blog in blogs:
-      if blog.title.text == blog_name:
-        return blog
-    raise NoSuchBlogError("Ooops! You don't have a blog %s" % blog_name)
+      - *username* -- the email of the blogger user
+      - *password* -- the password of the blogger user
+    """
+    self.client = gdata.blogger.client.BloggerClient()
+    self.client.client_login(
+      config['username'],
+      config['password'],
+      'frogstarb',
+      service='blogger')
 
-def new(config):
-  client = connect(config)
-  blog = select_blog(client, config.get('blog',''))
-  return Blog(blog, client)
+  def get_blog_by_title(self,blog_name):
+    """
+      Select a blog by the name.
+    """
+    blog = self.select_blog(blog_name)
+    return Blog(blog, self.client)
+
+  def select_blog(self,blog_name):
+    """
+      Select a blog by the name interactively, if necessary.
+    """
+    # TODO something like http://github.com/jweslley/frogstarb/blob/java/src/main/java/net/jonhnnyweslley/frogstarb/FrogstarB.java#getBlogId()
+    blogs = self.client.get_blogs().entry
+    if (len(blogs) == 0):
+      raise NoSuchBlogError("Ooops! You don't have a blog yet!")
+    elif (len(blogs) == 1):
+      return blogs[0]
+    else:
+      for blog in blogs:
+        if blog.title.text == blog_name:
+          return blog
+      raise NoSuchBlogError("Ooops! You don't have a blog %s" % blog_name)
+

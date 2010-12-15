@@ -20,7 +20,6 @@ Copyright 2010 Jonhnny Weslley
 
 License: Apache License v2.0 (see docs/LICENSE for details)
 """
-# TODO improve usage
 
 version = "0.1.0"
 version_info = (0,1,0, "Beta")
@@ -30,7 +29,7 @@ import blogger, markup
 
 # post processors --------------------------------------------------------------
 
-def pystaches(data):
+def pystaches(data,config):
   try:
     import pystaches
   except ImportError:
@@ -40,7 +39,7 @@ def pystaches(data):
     view.template = data['content']
     data['content'] = view.render()
 
-def smartypants(data):
+def smartypants(data,config):
   try:
     import smartypants
   except ImportError:
@@ -48,37 +47,53 @@ def smartypants(data):
   else:
     data['content'] = smartypants.smartyPants(data['content'])
 
-def set_title(data):
+def set_title(data,config):
   import os.path
   if not data.has_key('title'):
     basename = os.path.basename(data['path'])
     data['title'] = os.path.splitext(basename)[0]
 
-def _apply_postprocessors(data):
+def _apply_postprocessors(data,config):
   postprocessors = [pystaches, smartypants, set_title]
   for postprocessor in postprocessors:
-    postprocessor(data)
+    postprocessor(data,config)
 
-def get_blog(config):
-  return blogger.new(config)
-
-def publish(path,config):
+def render(path,config):
   renderer = markup.by_file_extension(path, config)
   with open(path, 'r') as f: content = f.read()
   data = renderer(content, config)
   data['path'] = path
-  _apply_postprocessors(data)
-  print data['content']
+  _apply_postprocessors(data,config)
+  return data
 
-#  blog = get_blog(config)
-#  blog.publish(data)
+def get_blog(config):
+  blogger_account = blogger.Account(config)
+  return blogger_account.get_blog_by_title(config.get('blog',''))
+
+def publish(path,config):
+  data = render(path,config)
+  #print data['content']
+  blog = get_blog(config)
+  post = blog.publish(data)
+  post_url = [link.href for link in post.link if link.rel == 'alternate']
+  if post_url:
+    print "Your blog post was published successfully!"
+    print "View post at %s" % post_url[0]
+  else:
+    print "Draft saved"
 
 def delete(path,config):
-  renderer = markup.by_file_extension(path, config)
-  data = renderer(path, config)
+  data = render(path,config)
   blog = get_blog(config)
-  post = blog.get_post_by_title(data['title'])
-  if post is None:
-    print "Post not found %s" % data['title']
+  post = blog.delete(data)
+  if post:
+    print "Your blog post was deleted!"
   else:
-    blog.delete(post)
+    print "Post not found %s" % data['title']
+
+# TODO def summary(path,config):
+# post title
+# author
+# comment count
+# url
+# tags

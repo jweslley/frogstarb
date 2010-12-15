@@ -6,6 +6,8 @@ FrogstarB is simple tool to post to [Blogger](http://www.blogger.com) from the c
 
 `TODO`
 
+## Basic Usage
+
 ## Usage
 
   `frogstarb [OPTIONS] ... [-p | -d <FILENAME>]`
