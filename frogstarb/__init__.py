@@ -27,6 +27,32 @@ version_info = (0,1,0, "Beta")
 import logging
 import blogger, markup
 
+# pre processors ---------------------------------------------------------------
+
+def set_title(data,config):
+  import os.path
+  if not data.has_key('title'):
+    basename = os.path.basename(data['path'])
+    data['title'] = os.path.splitext(basename)[0]
+
+def metadata(data,config):
+  import re
+  key_value_re = re.compile(r'^[ ]{0,3}(?P<key>[A-Za-z0-9_-]+):\s*(?P<value>.*)')
+  lines = data['content'].split('\n')
+  while True:
+    line = lines.pop(0)
+    if line.strip() == '':
+      break
+    m1 = key_value_re.match(line)
+    if m1:
+      key = m1.group('key').lower().strip()
+      data[key] = m1.group('value').strip()
+    else:
+      lines.insert(0, line)
+      break
+  data['content'] = '\n'.join(lines)
+
+
 # post processors --------------------------------------------------------------
 
 def pystaches(data,config):
@@ -47,22 +73,22 @@ def smartypants(data,config):
   else:
     data['content'] = smartypants.smartyPants(data['content'])
 
-def set_title(data,config):
-  import os.path
-  if not data.has_key('title'):
-    basename = os.path.basename(data['path'])
-    data['title'] = os.path.splitext(basename)[0]
+def _apply_preprocessors(data,config):
+  preprocessors = [set_title, metadata]
+  for preprocessor in preprocessors:
+    preprocessor(data,config)
 
 def _apply_postprocessors(data,config):
-  postprocessors = [pystaches, smartypants, set_title]
+  postprocessors = [pystaches, smartypants]
   for postprocessor in postprocessors:
     postprocessor(data,config)
 
 def render(path,config):
-  renderer = markup.by_file_extension(path, config)
   with open(path, 'r') as f: content = f.read()
-  data = renderer(content, config)
-  data['path'] = path
+  renderer = markup.by_file_extension(path, config)
+  data = {'content':content, 'path':path}
+  _apply_preprocessors(data,config)
+  data.update(renderer(data['content'], config))
   _apply_postprocessors(data,config)
   return data
 
@@ -73,6 +99,8 @@ def get_blog(config):
 def publish(path,config):
   data = render(path,config)
   #print data['content']
+  data.pop('content')
+  print data
   blog = get_blog(config)
   post = blog.publish(data)
   post_url = [link.href for link in post.link if link.rel == 'alternate']
