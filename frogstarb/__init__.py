@@ -56,36 +56,26 @@ def metadata(data):
 # post processors --------------------------------------------------------------
 
 def pystaches(data):
-  try:
-    import pystaches
-  except ImportError:
-    raise Exception, "Pystaches support is not installed yet. Install pystaches."
-  else:
-    class FrogView(pystaches.FatView):
+  if data.get('pystaches','yes') == 'yes':
+    from pystache import View
+    from pystaches import EmbedVideo, SyntaxHighlighter
 
-      def __init__ (self, config):
-        self.config = config
+    class FatView(View, EmbedVideo, SyntaxHighlighter):
+      def __init__(self, template, config):
+        View.__init__(self, template, config)
+        SyntaxHighlighter.tab_length = int(config.get('tab_length', '2'))
+        SyntaxHighlighter.linenos    = config.get('linenos', 'yes') == 'yes'
+        SyntaxHighlighter.css_class  = config.get('css_class', 'highlight')
+        SyntaxHighlighter.prefix     = config.get('syntax_prefix', 'highlight_')
 
-      def __getattr__(self, name):
-        try:
-          pystaches.FatView.__getattr__(self,name)
-        except AttributeError:
-          if self.config.has_key(name):
-            return self.config[name]
-          else:
-            raise AttributeError, nome
-
-    view = FrogView(data)
-    view.template = data['content']
+    view = FatView(data['content'], data)
     data['content'] = view.render()
 
 def smartypants(data):
-  try:
+  if data.get('smartypants','no') != 'no':
     import smartypants
-  except ImportError:
-    raise Exception, "Smartypants support is not installed yet. Install smartypants."
-  else:
-    data['content'] = smartypants.smartyPants(data['content'])
+    smartypants_opts = '1' if data['smartypants'] == 'yes' else data['smartypants']
+    data['content'] = smartypants.smartyPants(data['content'], smartypants_opts)
 
 def _apply_preprocessors(data):
   preprocessors = [set_title, metadata]
@@ -112,9 +102,6 @@ def get_blog(config):
 
 def publish(path,config):
   data = render(path,config)
-  #print data['content']
-  data.pop('content')
-  print data
   blog = get_blog(config)
   post = blog.publish(data)
   post_url = [link.href for link in post.link if link.rel == 'alternate']

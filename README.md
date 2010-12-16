@@ -8,7 +8,9 @@ FrogstarB is simple tool to post to [Blogger](http://www.blogger.com) from the c
 
 To install the dependencies using `easy_install` just run the following:
 
-    $ sudo easy_install gdata markdown pystaches
+    $ sudo easy_install gdata pystaches markdown
+
+Note: pystache's version on Pypi is buggy, checkout it from git repository and install.
 
 ### Optional dependencies
 
