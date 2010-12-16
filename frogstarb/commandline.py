@@ -31,8 +31,6 @@ def parse_options():
     help="The blog's name. This option is not required if either the "  \
     "blogger user has just one blog or the 'blog' property is defined " \
     "in the configuration file.")
-  parser.add_option("-t", "--tags", dest="tags", metavar="TAG_LIST",
-    help="The list of tags from the post, specified as a comma-separated list.")
   parser.add_option("-c", "--config-file", dest="config", metavar="CONFIG_FILE",
     help="The configuration file. Defaults to '~/.frogstarb'.", default='')
 
@@ -55,8 +53,6 @@ def configure(options,service='blogger'):
     config['password'] = options.password
   if options.blog:
     config['blog'] = options.blog
-  if options.tags:
-    config['tags'] = options.tags
 
   # prompt for required fields
   if not config.has_key('username'):

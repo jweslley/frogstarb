@@ -29,13 +29,13 @@ import blogger, markup
 
 # pre processors ---------------------------------------------------------------
 
-def set_title(data,config):
+def set_title(data):
   import os.path
   if not data.has_key('title'):
     basename = os.path.basename(data['path'])
     data['title'] = os.path.splitext(basename)[0]
 
-def metadata(data,config):
+def metadata(data):
   import re
   key_value_re = re.compile(r'^[ ]{0,3}(?P<key>[A-Za-z0-9_-]+):\s*(?P<value>.*)')
   lines = data['content'].split('\n')
@@ -55,17 +55,31 @@ def metadata(data,config):
 
 # post processors --------------------------------------------------------------
 
-def pystaches(data,config):
+def pystaches(data):
   try:
     import pystaches
   except ImportError:
     raise Exception, "Pystaches support is not installed yet. Install pystaches."
   else:
-    view = pystaches.FatView()
+    class FrogView(pystaches.FatView):
+
+      def __init__ (self, config):
+        self.config = config
+
+      def __getattr__(self, name):
+        try:
+          pystaches.FatView.__getattr__(self,name)
+        except AttributeError:
+          if self.config.has_key(name):
+            return self.config[name]
+          else:
+            raise AttributeError, nome
+
+    view = FrogView(data)
     view.template = data['content']
     data['content'] = view.render()
 
-def smartypants(data,config):
+def smartypants(data):
   try:
     import smartypants
   except ImportError:
@@ -73,24 +87,24 @@ def smartypants(data,config):
   else:
     data['content'] = smartypants.smartyPants(data['content'])
 
-def _apply_preprocessors(data,config):
+def _apply_preprocessors(data):
   preprocessors = [set_title, metadata]
   for preprocessor in preprocessors:
-    preprocessor(data,config)
+    preprocessor(data)
 
-def _apply_postprocessors(data,config):
+def _apply_postprocessors(data):
   postprocessors = [pystaches, smartypants]
   for postprocessor in postprocessors:
-    postprocessor(data,config)
+    postprocessor(data)
 
 def render(path,config):
   with open(path, 'r') as f: content = f.read()
   renderer = markup.by_file_extension(path, config)
-  data = {'content':content, 'path':path}
-  _apply_preprocessors(data,config)
-  data.update(renderer(data['content'], config))
-  _apply_postprocessors(data,config)
-  return data
+  config.update({'content':content, 'path':path})
+  _apply_preprocessors(config)
+  config.update({'content':renderer(config['content'], config)})
+  _apply_postprocessors(config)
+  return config
 
 def get_blog(config):
   blogger_account = blogger.Account(config)

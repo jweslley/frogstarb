@@ -17,16 +17,15 @@ def render_markdown(content,config):
   import markdown
   markdown_opts = config.get('markdown', 'meta;codehilite(force_linenos=True,css_class=highlight);footnotes')
   md = markdown.Markdown(markdown_opts.split(';'))
-  data = {'content':md.convert(content)}
+  content = md.convert(content)
   if md.Meta:
-    data['tags']  = md.Meta.get('tags', [''])[0]
-    data['title'] = md.Meta.get('title',[''])[0]
-    data['draft'] = md.Meta.get('draft',['no'])[0]
-  return data
+    for key in md.Meta.keys():
+      config[key] = '\n'.join(md.Meta[key])
+  return content
 
 def render_textile(content,config):
   import textile
-  return {'content':textile.textile(content.encode(config.get('encoding','utf-8')))}
+  return textile.textile(content.encode(config.get('encoding','utf-8')))
 
 def render_rst(content,config):
   import docutils
@@ -41,7 +40,7 @@ def render_rst(content,config):
   if rst_warnings:
     logging.warn(rst_warnings)
  
-  return {'content':parts['html_body']}
+  return parts['html_body']
 
 def render_plain(content,config):
   html_escape_table = {
@@ -52,12 +51,12 @@ def render_plain(content,config):
     "<": "&lt;",
     "\n": "<br/>\n" # line breaking
   }
-  return {'content':"".join(html_escape_table.get(c,c) for c in content)}
+  return "".join(html_escape_table.get(c,c) for c in content)
 
 
 # Mapping: file extension -> (human readable name, renderer)
 MARKUP = {
-  '.html':     ('HTML', lambda content, config: {'content': content}),
+  '.html':     ('HTML', lambda content, config: content),
   '.txt':      ('Plain Text', render_plain),
   '.markdown': ('Markdown', render_markdown),
   '.mkdn':     ('Markdown', render_markdown),
