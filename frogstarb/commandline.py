@@ -81,7 +81,7 @@ def _run():
 
   if options.render:
     check_file(options.render)
-    print frogstarb.render(options.render,config)['content']
+    print frogstarb.render(options.render,config)['content'].encode('utf-8')
     sys.exit(0)
 
   assert options.publish or options.delete, "No actions to be taken! :P"

@@ -88,7 +88,7 @@ def _apply_postprocessors(data):
     postprocessor(data)
 
 def render(path,config):
-  with open(path, 'r') as f: content = f.read()
+  with open(path, 'r') as f: content = unicode(f.read(),'utf-8')
   renderer = markup.by_file_extension(path, config)
   config.update({'content':content, 'path':path})
   _apply_preprocessors(config)
