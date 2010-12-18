@@ -15,10 +15,10 @@ import os.path
 
 def render_markdown(content,config):
   import markdown
-  markdown_opts = config.get('markdown', 'meta;codehilite(force_linenos=True,css_class=highlight);footnotes')
+  markdown_opts = config.get('markdown', 'meta;codehilite;footnotes')
   md = markdown.Markdown(markdown_opts.split(';'))
   content = md.convert(content)
-  if md.Meta:
+  if hasattr(md, 'Meta'):
     for key in md.Meta.keys():
       config[key] = '\n'.join(md.Meta[key])
   return content
