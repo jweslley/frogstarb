@@ -99,11 +99,13 @@ def run():
   """
     Run FrogstarB from the command line.
   """
+  from socket import gaierror
   try:
     _run()
   except ImportError as e:
     module_name = e.args[0].split()[-1]
-    print "%s support is not installed yet. Install %s" % (module_name.capitalize(), module_name)
+    print "You are missing a library required for %s. Please run:" % module_name.capitalize()
+    print "  $ [sudo] easy_install %s" % module_name
     sys.exit(1)
   except AssertionError as e:
     print e.args[0]
@@ -114,3 +116,6 @@ def run():
   except blogger.NoSuchBlogError as e:
     print e.args[0]
     sys.exit(4)
+  except gaierror:
+    print "Please, check your network connection."
+    sys.exit(5)
