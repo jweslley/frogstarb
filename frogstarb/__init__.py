@@ -120,6 +120,15 @@ def delete(path,config):
   else:
     print "Post not found: %s" % data['title']
 
+def preview(path,config):
+  import pystache, tempfile, webbrowser
+  data = render(path,config)
+  with open('preview-template.html', 'r') as f: template = unicode(f.read(),'utf-8') # TODO configure template
+  html = pystache.render(template, data).encode('utf-8')
+  __, filename = tempfile.mkstemp(suffix='.html')
+  with open(filename, 'w') as f: f.write(html)
+  webbrowser.open(filename)
+
 # TODO def summary(path,config):
 # post title
 # author

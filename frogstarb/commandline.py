@@ -21,8 +21,8 @@ def parse_options():
     " the post will be updated.")
   parser.add_option("-d", "--delete", dest="delete", metavar="FILENAME",
     help="Delete the post whose title is equal to the FILENAME without extension.")
-  parser.add_option("-r", "--render", dest="render", metavar="FILENAME",
-    help="Print the rendered FILENAME to standard output instead of publish it.")
+  parser.add_option("-r", "--preview", dest="preview", metavar="FILENAME",
+    help="Display the rendered FILENAME using the default browser.")
   parser.add_option("-u", "--username", dest="username", metavar="USERNAME",
     help="The username of the blogger user. This option is not required if " \
     "the 'username' property is defined in the configuration file.")
@@ -79,9 +79,9 @@ def _run():
   options = parse_options()
   config = configure(options)
 
-  if options.render:
-    check_file(options.render)
-    print frogstarb.render(options.render,config)['content'].encode('utf-8')
+  if options.preview:
+    check_file(options.preview)
+    frogstarb.preview(options.preview,config)
     sys.exit(0)
 
   assert options.publish or options.delete, "No actions to be taken! :P"
