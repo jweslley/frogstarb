@@ -1,0 +1,2 @@
+include bin/frogstarb README.md COPYING
+recursive-include frogstarb/preview *

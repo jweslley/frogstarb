@@ -15,7 +15,7 @@ import os.path
 
 def render_markdown(content,config):
   import markdown
-  markdown_opts = config.get('markdown', 'meta;codehilite;footnotes')
+  markdown_opts = config.get('markdown', 'meta;codehilite(css_class=highlight);footnotes')
   md = markdown.Markdown(markdown_opts.split(';'))
   content = md.convert(content)
   if hasattr(md, 'Meta'):

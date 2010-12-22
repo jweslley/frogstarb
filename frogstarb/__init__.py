@@ -63,7 +63,7 @@ def pystaches(data):
       def __init__(self, template, config):
         View.__init__(self, template, config)
         SyntaxHighlighter.tab_length = int(config.get('tab_length', '2'))
-        SyntaxHighlighter.linenos    = config.get('linenos', 'yes') == 'yes'
+        SyntaxHighlighter.linenos    = config.get('linenos', 'no') == 'yes'
         SyntaxHighlighter.css_class  = config.get('css_class', 'highlight')
         SyntaxHighlighter.prefix     = config.get('syntax_prefix', 'highlight_')
 
@@ -120,13 +120,25 @@ def delete(path,config):
     print "Post not found: %s" % data['title']
 
 def preview(path,config):
-  import pystache, tempfile, webbrowser
+  import glob, pystache, tempfile, webbrowser
+  root = root_path()
+  html_template_file = config.get('preview_html_template', os.path.join(root, 'preview', 'template.html'))
+  stylesheets = glob.glob(config.get('preview_stylesheets', os.path.join(root, 'preview', '*.css')))
+  config['preview_stylesheets'] = [{'stylesheet': stylesheet} for stylesheet in stylesheets]
+
   data = render(path,config)
-  with open('preview-template.html', 'r') as f: template = unicode(f.read(),'utf-8') # TODO configure template
-  html = pystache.render(template, data).encode('utf-8')
+  with open(html_template_file, 'r') as f: html_template = unicode(f.read(),'utf-8')
+  html = pystache.render(html_template, data).encode('utf-8')
   __, filename = tempfile.mkstemp(suffix='.html')
   with open(filename, 'w') as f: f.write(html)
   webbrowser.open(filename)
+
+def root_path():
+  root = __file__
+  if os.path.islink(root):
+    root = os.path.realpath(root)
+  return os.path.dirname(os.path.abspath(root))
+
 
 # TODO def summary(path,config):
 # post title

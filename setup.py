@@ -33,6 +33,7 @@ setup(
    download_url =  'http://github.com/jweslley/frogstarb/tarball/v%s' % version,
    license =       'Apache License v2.0',
    packages =      ['frogstarb'],
+   package_data =  {'frogstarb' : ['preview/*']},
    scripts =       ['bin/frogstarb'],
    requires =      ["gdata", "markdown", "pystaches"],
    cmdclass =      {'install_scripts': b_install_scripts},
@@ -44,7 +45,7 @@ setup(
                     'Environment :: Web Environment',
                     'Intended Audience :: End Users/Desktop',
                     'Natural Language :: English',
-                    'Operating System :: OS Independent',
+                    'Operating System :: POSIX :: Linux',
                     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                     'Topic :: Internet :: WWW/HTTP :: Site Management',
                     'Topic :: Text Processing :: Markup :: HTML'
