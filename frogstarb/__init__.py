@@ -18,19 +18,18 @@ Contact: jw [at] jonhnnyweslley.net
 
 Copyright 2010 Jonhnny Weslley
 
-License: Apache License v2.0 (see docs/LICENSE for details)
+License: MIT License (see COPYING for details)
 """
 
 version = "0.1.0"
 version_info = (0,1,0, "Beta")
 
-import logging
+import os.path, logging
 import blogger, markup
 
 # pre processors ---------------------------------------------------------------
 
 def set_title(data):
-  import os.path
   if not data.has_key('title'):
     basename = os.path.basename(data['path'])
     data['title'] = os.path.splitext(basename)[0]

@@ -20,7 +20,7 @@ Contact: jw [at] jonhnnyweslley.net
 
 Copyright 2010 Jonhnny Weslley
 
-License: Apache License v2.0 (see docs/LICENSE for details)
+License: MIT License (see COPYING for details)
 """
 
 from frogstarb import commandline
