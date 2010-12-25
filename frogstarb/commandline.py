@@ -85,7 +85,7 @@ def select_blog(blogs,blog_name):
 
   selected_blog = raw_input("\nSelect one of them typing the blog number (Just press ENTER to exit): ")
   if not selected_blog:
-    sys.exit(0)
+    sys.exit(10)
   try:
     selected_blog = int(selected_blog)
   except ValueError:
@@ -118,14 +118,13 @@ def query_yes_no(question,default="yes"):
     raise ValueError("Invalid default answer: '%s'" % default)
 
   while True:
-    sys.stdout.write(question + prompt)
-    choice = raw_input().lower()
+    choice = raw_input(question + prompt).lower()
     if default is not None and choice == '':
       return valid[default]
     elif choice in valid:
       return valid[choice]
     else:
-      sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+      print "Please respond with 'yes' or 'no' (or 'y' or 'n')."
 
 def check_file(filename):
   assert os.path.exists(filename), "No such file %s" % filename
@@ -185,13 +184,16 @@ def run():
     _run()
   except ImportError as e:
     module_name = e.args[0].split()[-1]
-    print "You are missing a library required for %s. Please run:" % module_name.capitalize()
-    print "  $ [sudo] easy_install %s" % module_name
+    print "The library '%s' is currently not installed. You can install it by typing:" % module_name
+    print "sudo easy_install %s" % module_name
     sys.exit(1)
   except AssertionError as e:
     print e.args[0]
     sys.exit(2)
   except KeyboardInterrupt:
+    print "Bye!"
+    sys.exit(3)
+  except EOFError:
     print "Bye!"
     sys.exit(3)
   except blogger.NoSuchBlogError as e:
