@@ -33,8 +33,6 @@ def parse_options():
     help="The blog's name. This option is not required if either the "  \
     "blogger user has just one blog or the 'blog' property is defined " \
     "in the configuration file.")
-  parser.add_option("-c", "--config-file", dest="config", metavar="CONFIG_FILE",
-    help="The configuration file. Defaults to '~/.frogstarb'.", default='')
 
   (options, args) = parser.parse_args()
   return options
@@ -44,7 +42,7 @@ def configure(options,service='blogger'):
     Configure frogstarb from both command-line and configuration file.
   """
   parser = ConfigParser.ConfigParser()
-  parser.read([os.path.expanduser('~/.frogstarb'), options.config])
+  parser.read([os.path.expanduser('~/.frogstarb')])
 
   config = dict(parser.items(service)) if parser.has_section(service) else {}
 
