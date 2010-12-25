@@ -25,7 +25,7 @@ version = "0.1.0"
 version_info = (0,1,0, "Beta")
 
 import os.path, logging
-import blogger, markup
+import markup
 
 # pre processors ---------------------------------------------------------------
 
@@ -86,6 +86,8 @@ def _apply_postprocessors(data):
   for postprocessor in postprocessors:
     postprocessor(data)
 
+# public api -------------------------------------------------------------------
+
 def render(path,config):
   with open(path, 'r') as f: content = unicode(f.read(),'utf-8')
   renderer = markup.by_file_extension(path, config)
@@ -95,29 +97,13 @@ def render(path,config):
   _apply_postprocessors(config)
   return config
 
-def get_blog(config):
-  blogger_account = blogger.Account(config)
-  return blogger_account.get_blog_by_title(config.get('blog',''))
-
-def publish(path,config):
+def publish(blog,path,config):
   data = render(path,config)
-  blog = get_blog(config)
-  post = blog.publish(data)
-  post_url = [link.href for link in post.link if link.rel == 'alternate']
-  if post_url:
-    print "Your blog post was published successfully!"
-    print "View post at %s" % post_url[0]
-  else:
-    print "Draft saved"
+  return blog.publish(data)
 
-def delete(path,config):
+def delete(blog,path,config):
   data = render(path,config)
-  blog = get_blog(config)
-  post = blog.delete(data)
-  if post:
-    print "Your blog post was deleted!"
-  else:
-    print "Post not found: %s" % data['title']
+  return blog.delete(data)
 
 def preview(path,config):
   import glob, pystache, tempfile, webbrowser

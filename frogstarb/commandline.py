@@ -9,7 +9,6 @@ def parse_options():
   """
     Define and parse `optparse` options for command-line usage.
   """
-
   parser = optparse.OptionParser(
       usage =       "%prog [OPTIONS] ... [-p | -d | -r <FILENAME>]",
       description = "Simple tool to post to Blogger.com from the command line.\n" \
@@ -54,12 +53,6 @@ def configure(options,service='blogger'):
   if options.blog:
     config['blog'] = options.blog
 
-  # prompt for required fields
-  if not config.has_key('username'):
-    config['username'] = raw_input('Username: ')
-  if not config.has_key('password'):
-    config['password'] = getpass("Enter your password(%s): "%config['username'])
-
   # resolve blog alias if any
   if config.has_key('blog') \
       and parser.has_section('alias') \
@@ -68,10 +61,88 @@ def configure(options,service='blogger'):
 
   return config
 
+def select_blog(blogs,blog_name):
+  """
+    Select a blog by the name or interactively, if necessary.
+  """
+  if len(blogs) == 0:
+    raise NoSuchBlogError("Ooops! You don't have a blog yet!")
+
+  if len(blogs) == 1:
+    return blogs[0]
+
+  for blog in blogs:
+    if blog == blog_name:
+      return blog
+
+  response = query_yes_no("The blog '%s' doesn't exists. Select another blog to continue?" % blog_name)
+  if not response:
+    sys.exit(42)
+
+  print "\nList of your blogs:"
+  for i in range(len(blogs)):
+    print "%s : %s" % (i, blogs[i])
+
+  selected_blog = raw_input("\nSelect one of them typing the blog number (Just press ENTER to exit): ")
+  if not selected_blog:
+    sys.exit(0)
+  try:
+    selected_blog = int(selected_blog)
+  except ValueError:
+    raise NoSuchBlogError("Failed. Invalid blog number: %s" % selected_blog)
+
+  if not (selected_blog >= 0 and selected_blog < len(blogs)):
+    raise NoSuchBlogError("Failed. Selected blog number is out of range: %s" % range(len(blogs)))
+
+  return blogs[selected_blog]
+
+def query_yes_no(question,default="yes"):
+  """
+    Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+      It must be "yes" (the default), "no" or None (meaning
+      an answer is required of the user).
+
+    The "answer" return value is one of "yes" or "no".
+  """
+  valid = {"yes":True, "ye":True, "y":True, "no":False, "n":False}
+  if default == None:
+    prompt = " [y/n] "
+  elif default == "yes":
+    prompt = " [Y/n] "
+  elif default == "no":
+    prompt = " [y/N] "
+  else:
+    raise ValueError("Invalid default answer: '%s'" % default)
+
+  while True:
+    sys.stdout.write(question + prompt)
+    choice = raw_input().lower()
+    if default is not None and choice == '':
+      return valid[default]
+    elif choice in valid:
+      return valid[choice]
+    else:
+      sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
+
 def check_file(filename):
   assert os.path.exists(filename), "No such file %s" % filename
   assert os.path.isfile(filename), "File is a directory: %s" % filename
   assert os.access(filename, os.R_OK), "No permission to read the file: %s" % filename
+
+def get_blog(config):
+  # prompt for required fields
+  if not config.has_key('username'):
+    config['username'] = raw_input('Username: ')
+  if not config.has_key('password'):
+    config['password'] = getpass("Enter your password(%s): "%config['username'])
+
+  blogger_account = blogger.Account(config)
+  blogs = blogger_account.get_blogs()
+  blog_name = selected_blog(blogs, config.get('blog',''))
+  return blogger_account.get_blog(blog_name)
 
 def _run():
   options = parse_options()
@@ -87,11 +158,23 @@ def _run():
 
   if options.publish:
     check_file(options.publish)
-    frogstarb.publish(options.publish, config)
+    blog = get_blog(config)
+    post = frogstarb.publish(blog, options.publish, config)
+    post_url = blog.post_url(post)
+    if post_url:
+      print "Your blog post was published successfully!"
+      print "View post at %s" % post_url
+    else:
+      print "Draft saved"
 
   if options.delete:
     check_file(options.delete)
-    frogstarb.delete(options.delete, config)
+    blog = get_blog(config)
+    post = frogstarb.delete(blog, options.delete, config)
+    if post:
+      print "Your blog post was deleted!"
+    else:
+      print "Post not found: %s" % data['title']
 
 def run():
   """

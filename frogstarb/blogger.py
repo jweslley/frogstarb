@@ -1,7 +1,6 @@
 import gdata.blogger.client
 import gdata.blogger.data
 import atom
-import sys
 
 class Blog:
   """
@@ -10,8 +9,8 @@ class Blog:
   """
 
   def __init__ (self, blog, client):
-    self.blog = blog
     self.client = client
+    self.blog_id = blog.get_blog_id()
 
   def add_post(self, data):
     """
@@ -24,7 +23,7 @@ class Blog:
       - *draft* -- if this post is a draft
     """
     return self.client.add_post(
-      self.blog.get_blog_id(),
+      self.blog_id,
       data['title'],
       data['content'],
       labels=self.taglist(data),
@@ -63,28 +62,35 @@ class Blog:
       Publish the post to the blog. If no posts matched with the given title,
       then a new post will be created, otherwise the existent post will be updated.
     """
-    post = self.get_post_by_title(data['title'])
+    post = self.get_post(data['title'])
     return self.update_post(post, data) if post else self.add_post(data)
 
   def delete(self, data):
     """
       Delete a post.
     """
-    post = self.get_post_by_title(data['title'])
+    post = self.get_post(data['title'])
     return self.client.delete(post) if post else None
 
   def get_posts(self):
     """
       List all posts.
     """
-    return self.client.get_posts(self.blog.get_blog_id()).entry
+    return [post.title.text for post in self.client.get_posts(self.blog_id).entry]
 
-  def get_post_by_title(self, post_title):
+  def get_post(self, post_title):
     """
       Retrieve a post by title.
     """
-    posts = [post for post in self.get_posts() if post.title.text == post_title]
+    posts = [post for post in self.client.get_posts(self.blog_id).entry if post.title.text == post_title]
     return posts[0] if len(posts) == 1 else None
+
+  def post_url(self, post):
+    """
+      Retrieve the url for a given post.
+    """
+    urls = [link.href for link in post.link if link.rel == 'alternate']
+    return urls[0] if len(urls) == 1 else None
 
   def taglist(self,data):
     """
@@ -107,82 +113,21 @@ class Account:
       - *password* -- the password of the blogger user
     """
     self.client = gdata.blogger.client.BloggerClient()
-    self.client.client_login(
-      config['username'],
-      config['password'],
-      'frogstarb',
-      service='blogger')
+    self.client.client_login(config['username'], config['password'], 'frogstarb', service='blogger')
 
-  def get_blog_by_title(self,blog_name):
+  def get_blogs(self):
     """
-      Select a blog by the name.
+      List all blogs.
     """
-    blog = self.select_blog(blog_name)
-    return Blog(blog, self.client)
+    return [blog.title.text for blog in self.client.get_blogs().entry]
 
-  def select_blog(self,blog_name):
+  def get_blog(self,blog_name):
     """
-      Select a blog by the name or interactively, if necessary.
+      Retrieve a blog by the name.
     """
-    blogs = self.client.get_blogs().entry
-    if len(blogs) == 0:
-      raise NoSuchBlogError("Ooops! You don't have a blog yet!")
-
-    if len(blogs) == 1:
+    blogs = [blog for blog in self.client.get_blogs().entry if blog.title.text == blog_name]
+    if len(blogs) > 0:
       return blogs[0]
-
-    for blog in blogs:
-      if blog.title.text == blog_name:
-        return blog
-
-    response = self.query_yes_no("The blog '%s' doesn't exists. Select another blog to continue?" % blog_name)
-    if not response:
-      sys.exit(10)
-
-    print "\nList of your blogs:"
-    for i in range(len(blogs)):
-      print "%s : %s" % (i, blogs[i].title.text)
-
-    selected_blog = raw_input("\nSelect one of them typing the blog number (Just press ENTER to exit): ")
-    if not selected_blog:
-      sys.exit(0)
-    try:
-      selected_blog = int(selected_blog)
-    except ValueError:
-      raise NoSuchBlogError("Failed. Invalid blog number: %s" % selected_blog)
-
-    if not (selected_blog >= 0 and selected_blog < len(blogs)):
-      raise NoSuchBlogError("Failed. Selected blog number is out of range: %s" % range(len(blogs)))
-
-    return blogs[selected_blog]
-
-  def query_yes_no(self,question,default="yes"):
-    """
-      Ask a yes/no question via raw_input() and return their answer.
-
-      "question" is a string that is presented to the user.
-      "default" is the presumed answer if the user just hits <Enter>.
-        It must be "yes" (the default), "no" or None (meaning
-        an answer is required of the user).
-
-      The "answer" return value is one of "yes" or "no".
-    """
-    valid = {"yes":True, "ye":True, "y":True, "no":False, "n":False}
-    if default == None:
-      prompt = " [y/n] "
-    elif default == "yes":
-      prompt = " [Y/n] "
-    elif default == "no":
-      prompt = " [y/N] "
     else:
-      raise ValueError("invalid default answer: '%s'" % default)
+      raise NoSuchBlogError("Blog not found: %s" % blog_name)
 
-    while True:
-      sys.stdout.write(question + prompt)
-      choice = raw_input().lower()
-      if default is not None and choice == '':
-        return valid[default]
-      elif choice in valid:
-        return valid[choice]
-      else:
-        sys.stdout.write("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
