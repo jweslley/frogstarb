@@ -24,7 +24,7 @@ License: MIT License (see COPYING for details)
 version = "0.1.0"
 version_info = (0,1,0, "Beta")
 
-import os.path, logging
+import os.path, logging, ConfigParser
 import markup
 
 # pre processors ---------------------------------------------------------------
@@ -124,6 +124,21 @@ def root_path():
   if os.path.islink(root):
     root = os.path.realpath(root)
   return os.path.dirname(os.path.abspath(root))
+
+def config(config_overrides={}):
+  parser = ConfigParser.ConfigParser()
+  parser.read([os.path.expanduser('~/.frogstarb')])
+
+  config = dict(parser.items('blogger')) if parser.has_section('blogger') else {}
+  config.update(config_overrides)
+
+  # resolve blog alias if any
+  if config.has_key('blog') \
+      and parser.has_section('alias') \
+      and parser.has_option('alias',config['blog']):
+    config['blog'] = parser.get('alias',config['blog'])
+
+  return config
 
 
 # TODO def summary(path,config):

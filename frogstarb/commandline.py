@@ -28,7 +28,7 @@ def parse_options():
   parser.add_option("-P", "--password", dest="password", metavar="PASSWORD",
     help="The password of the blogger user. This option is not required if " \
     "the 'password' property is defined in the configuration file.")
-  parser.add_option("-b", "--blog-name", dest="blog", metavar="BLOGNAME",
+  parser.add_option("-b", "--blog", dest="blog", metavar="BLOGNAME",
     help="The blog's name. This option is not required if either the "  \
     "blogger user has just one blog or the 'blog' property is defined " \
     "in the configuration file.")
@@ -36,16 +36,12 @@ def parse_options():
   (options, args) = parser.parse_args()
   return options
 
-def configure(options,service='blogger'):
+def configure(options):
   """
     Configure frogstarb from both command-line and configuration file.
+    Allow command line options to overwrite settings from configuration file.
   """
-  parser = ConfigParser.ConfigParser()
-  parser.read([os.path.expanduser('~/.frogstarb')])
-
-  config = dict(parser.items(service)) if parser.has_section(service) else {}
-
-  # Allow command line options to overwrite config settings
+  config = {}
   if options.username:
     config['username'] = options.username
   if options.password:
@@ -53,13 +49,7 @@ def configure(options,service='blogger'):
   if options.blog:
     config['blog'] = options.blog
 
-  # resolve blog alias if any
-  if config.has_key('blog') \
-      and parser.has_section('alias') \
-      and parser.has_option('alias',config['blog']):
-    config['blog'] = parser.get('alias',config['blog'])
-
-  return config
+  return frogstarb.config(config)
 
 def select_blog(blogs,blog_name):
   """
@@ -128,7 +118,7 @@ def query_yes_no(question,default="yes"):
 
 def check_file(filename):
   assert os.path.exists(filename), "No such file %s" % filename
-  assert os.path.isfile(filename), "File is a directory: %s" % filename
+  assert os.path.isfile(filename), "Path is not a file: %s" % filename
   assert os.access(filename, os.R_OK), "No permission to read the file: %s" % filename
 
 def get_blog(config):
@@ -179,7 +169,7 @@ def run():
   """
     Run FrogstarB from the command line.
   """
-  from socket import gaierror
+  import socket
   try:
     _run()
   except ImportError as e:
@@ -199,6 +189,6 @@ def run():
   except blogger.NoSuchBlogError as e:
     print e.args[0]
     sys.exit(4)
-  except gaierror:
+  except socket.gaierror:
     print "Please, check your network connection."
     sys.exit(5)
