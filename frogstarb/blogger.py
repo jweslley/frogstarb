@@ -127,7 +127,7 @@ class Account:
     """
     blogs = [blog for blog in self.client.get_blogs().entry if blog.title.text == blog_name]
     if len(blogs) > 0:
-      return blogs[0]
+      return Blog(blogs[0], self.client)
     else:
       raise NoSuchBlogError("Blog not found: %s" % blog_name)
 

@@ -130,7 +130,7 @@ def get_blog(config):
 
   blogger_account = blogger.Account(config)
   blogs = blogger_account.get_blogs()
-  blog_name = selected_blog(blogs, config.get('blog',''))
+  blog_name = select_blog(blogs, config.get('blog',''))
   return blogger_account.get_blog(blog_name)
 
 def _run():
